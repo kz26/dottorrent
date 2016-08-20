@@ -178,9 +178,9 @@ class Torrent(object):
 
         self._generated = True
 
-    def save(self):
+    def dump(self):
         """
-        Generates the bencoded torrent data.
+        Generates and returns the bencoded torrent data as a byte string.
         """
         if getattr(self, '_generated', False):
             data = OrderedDict()
@@ -223,3 +223,9 @@ class Torrent(object):
         else:
             raise Exception(
                 "Torrent not generated - call generate() before save()")
+
+    def save(self, fp):
+        """
+        Saves the torrent to fp, a file(-like) object.
+        """
+        fp.write(self.dump())
