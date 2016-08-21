@@ -53,6 +53,7 @@ class Torrent(object):
         trackers: list/iterable of tracker URLs
         http_seeds: list/iterable of HTTP seed URLs
         piece_size: Piece size in bytes. Must be >= 16 KB and a power of 2.
+        If None, detect_piece_size() will be used to automatically select one.
         private: The private flag. If True, DHT/PEX will be disabled.
         creation_date: A datetime object. If None, uses the current date/time.
         comment: An optional comment string for the torrent.
@@ -121,6 +122,29 @@ class Torrent(object):
         else:
             self._piece_size = None
 
+    def detect_piece_size(self):
+        """
+        Scans the input path and automatically determines the optimal
+        piece size (up to 4 MB).
+        Returns: (total_size, piece_size, num_pieces)
+        """
+        if getattr(self, '_files', None):
+            total_size = sum([x[1] for x in self._files])
+        elif os.path.isfile(self.path):
+            total_size = os.path.getsize(self.path)
+        else:
+            total_size = 0
+            for x in os.walk(self.path):
+                for fn in x[2]:
+                    fpath = os.path.normpath(os.path.join(x[0], fn))
+                    total_size += os.path.getsize(fpath)
+        ps = 1 << math.ceil(math.log(total_size / 1500, 2))
+        if ps < MIN_PIECE_SIZE:
+            ps = MIN_PIECE_SIZE
+        if ps > MAX_PIECE_SIZE:
+            ps = MAX_PIECE_SIZE
+        return (total_size, ps, math.ceil(total_size / ps))
+
     def generate(self, include_md5=False):
         """
         Computes and stores piece data.
@@ -140,12 +164,7 @@ class Torrent(object):
         total_size = sum([x[1] for x in self._files])
         # set piece size if not already set
         if self.piece_size is None:
-            ps = 1 << math.ceil(math.log(total_size / 1500, 2))
-            if ps < MIN_PIECE_SIZE:
-                ps = MIN_PIECE_SIZE
-            if ps > MAX_PIECE_SIZE:
-                ps = MAX_PIECE_SIZE
-            self.piece_size = ps
+            self.piece_size = self.detect_piece_size()[1]
         if self._files:
             self._pieces = bytearray()
             i = 0
