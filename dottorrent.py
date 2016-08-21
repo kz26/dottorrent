@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # MIT License
 
 # Copyright (c) 2016 Kevin Zhang
@@ -23,6 +21,7 @@
 # SOFTWARE.
 
 
+from base64 import b32encode
 from collections import OrderedDict
 from datetime import datetime
 from hashlib import sha1, md5
@@ -43,6 +42,10 @@ MIN_PIECE_SIZE = 2 ** 14
 MAX_PIECE_SIZE = 2 ** 22
 
 
+def print_err(v):
+    print(v, file=sys.stderr)
+
+
 class Torrent(object):
 
     def __init__(self, path, trackers=None, http_seeds=None,
@@ -53,9 +56,9 @@ class Torrent(object):
         trackers: list/iterable of tracker URLs
         http_seeds: list/iterable of HTTP seed URLs
         piece_size: Piece size in bytes. Must be >= 16 KB and a power of 2.
-        If None, detect_piece_size() will be used to automatically select one.
+        If None, get_info() will be used to automatically select one.
         private: The private flag. If True, DHT/PEX will be disabled.
-        creation_date: A datetime object. If None, uses the current date/time.
+        creation_date: An optional datetime object representing the torrent creation date.
         comment: An optional comment string for the torrent.
         created_by: name/version of the program used to create the .torrent.
         If None, defaults to the value of DEFAULT_CREATOR.
@@ -114,47 +117,56 @@ class Torrent(object):
                 if value < MIN_PIECE_SIZE:
                     raise Exception("Piece size should be at least 16 KB")
                 if value > MAX_PIECE_SIZE:
-                    sys.stderr.write(
-                        "Warning: piece size is greater than 4 MB\n")
+                    print_err("Warning: piece size is greater than 4 MB")
                 self._piece_size = value
             else:
                 raise Exception("Piece size must be a power of 2")
         else:
             self._piece_size = None
 
-    def detect_piece_size(self):
+    def get_info(self):
         """
         Scans the input path and automatically determines the optimal
-        piece size (up to 4 MB).
-        Returns: (total_size, piece_size, num_pieces)
+        piece size (up to 4 MB), along with other basic info such
+        as the total size and the total number of files.
+        Returns: (total_size, total_files, piece_size, num_pieces)
         """
         if getattr(self, '_files', None):
             total_size = sum([x[1] for x in self._files])
+            total_files = len(self._files)
         elif os.path.isfile(self.path):
             total_size = os.path.getsize(self.path)
+            total_files = 1
         else:
             total_size = 0
+            total_files = 0
             for x in os.walk(self.path):
                 for fn in x[2]:
                     fpath = os.path.normpath(os.path.join(x[0], fn))
                     total_size += os.path.getsize(fpath)
-        ps = 1 << math.ceil(math.log(total_size / 1500, 2))
-        if ps < MIN_PIECE_SIZE:
-            ps = MIN_PIECE_SIZE
-        if ps > MAX_PIECE_SIZE:
-            ps = MAX_PIECE_SIZE
-        return (total_size, ps, math.ceil(total_size / ps))
+                    total_files += 1
+        if self.piece_size:
+            ps = self.piece_size
+        else:
+            ps = 1 << math.ceil(math.log(total_size / 1500, 2))
+            if ps < MIN_PIECE_SIZE:
+                ps = MIN_PIECE_SIZE
+            if ps > MAX_PIECE_SIZE:
+                ps = MAX_PIECE_SIZE
+        return (total_size, total_files, ps, math.ceil(total_size / ps))
 
-    def generate(self, include_md5=False):
+    def generate(self, include_md5=False, callback=None):
         """
         Computes and stores piece data.
         include_md5: If True, also computes and stores MD5 hashes for each file.
+        callback: progress callable with method signature
+        (filename, pieces_completed, pieces_total)
         """
         self._files = []
         self._include_md5 = include_md5
         self._single_file = os.path.isfile(self.path)
         if self._single_file:
-            self._files.append((self.path, os.path.getsize(self.path)))
+            self._files.append((self.path, os.path.getsize(self.path), {}))
         else:
             for x in os.walk(self.path):
                 for fn in x[2]:
@@ -164,10 +176,12 @@ class Torrent(object):
         total_size = sum([x[1] for x in self._files])
         # set piece size if not already set
         if self.piece_size is None:
-            self.piece_size = self.detect_piece_size()[1]
+            self.piece_size = self.get_info()[2]
         if self._files:
             self._pieces = bytearray()
             i = 0
+            num_pieces = math.ceil(total_size / self.piece_size)
+            pc = 0
             buf = bytearray()
             while i < len(self._files):
                 fe = self._files[i]
@@ -183,6 +197,9 @@ class Torrent(object):
                         piece = buf[:self.piece_size]
                         self._pieces += sha1(piece).digest()
                         del buf[:self.piece_size]
+                        pc += 1
+                        if callback:
+                            callback(fe[0], pc, num_pieces)
                     if include_md5:
                         md5_hasher.update(chunk)
                 if include_md5:
@@ -194,54 +211,82 @@ class Torrent(object):
                 piece = buf[:self.piece_size]
                 self._pieces += sha1(piece).digest()
                 del buf[:self.piece_size]
+                pc += 1
+                if callback:
+                    callback(fe[0], pc, num_pieces)
 
-        self._generated = True
+        # Create the torrent data structure
+        data = OrderedDict()
+        if len(self.trackers) == 1:
+            data['announce'] = self.trackers[0]
+        elif len(self.trackers) > 1:
+            data['announce-list'] = [[x] for x in self.trackers]
+        if self.comment:
+            data['comment'] = self.comment
+        if self.created_by:
+            data['created by'] = self.created_by
+        else:
+            data['created by'] = DEFAULT_CREATOR
+        if self.creation_date:
+            data['creation date'] = int(self.creation_date.timestamp())
+        if self.http_seeds:
+            data['httpseeds'] = self.http_seeds
+        data['info'] = OrderedDict()
+        if self._single_file:
+            data['info']['length'] = self._files[0][1]
+            if self._include_md5:
+                data['info']['md5sum'] = self._files[0][2]['md5sum']
+            data['info']['name'] = self._files[0][0].split(os.sep)[-1]
+        else:
+            data['info']['files'] = []
+            for x in self._files:
+                fx = OrderedDict()
+                fx['length'] = x[1]
+                if self._include_md5:
+                    fx['md5sum'] = x[2]['md5sum']
+                fx['path'] = x[0].replace(self.path, '')[1:].split(os.sep)
+                data['info']['files'].append(fx)
+            data['info']['name'] = self.path.split(os.sep)[-1]
+        data['info']['pieces'] = bytes(self._pieces)
+        data['info']['piece length'] = self.piece_size
+        data['info']['private'] = int(self.private)
+
+        self._data = data
+
+    @property
+    def info_hash_base32(self):
+        """
+        Returns the base32 info hash of the torrent. Useful for generating
+        magnet links.
+        """
+        if getattr(self, '_data', None):
+            return b32encode(sha1(bencode(self._data['info'])).digest())
+        else:
+            raise Exception(
+                "Torrent not generated - call generate() first")
+
+    @property
+    def info_hash(self):
+        """
+        Returns the SHA-1 info hash of the torrent. Useful for generating
+        magnet links.
+        """
+        if getattr(self, '_data', None):
+            return sha1(bencode(self._data['info'])).hexdigest()
+        else:
+            raise Exception(
+                "Torrent not generated - call generate() first")
 
     def dump(self):
         """
-        Generates and returns the bencoded torrent data as a byte string.
+        Returns the bencoded torrent data as a byte string.
         """
-        if getattr(self, '_generated', False):
-            data = OrderedDict()
-            if len(self.trackers) == 1:
-                data['announce'] = self.trackers[0]
-            elif len(self.trackers) > 1:
-                data['announce-list'] = [[x] for x in self.trackers]
-            if self.comment:
-                data['comment'] = self.comment
-            if self.created_by:
-                data['created by'] = self.created_by
-            else:
-                data['created by'] = DEFAULT_CREATOR
-            if self.creation_date:
-                data['creation date'] = int(self.creation_date.timestamp())
-            else:
-                data['creation date'] = int(datetime.now().timestamp())
-            if self.http_seeds:
-                data['httpseeds'] = self.http_seeds
-            data['info'] = OrderedDict()
-            if self._single_file:
-                data['info']['length'] = self._files[0][1]
-                if self._include_md5:
-                    data['info']['md5sum'] = self._files[0][2]['md5sum']
-                data['info']['name'] = self._files[0][0].split(os.sep)[-1]
-            else:
-                data['info']['files'] = []
-                for x in self._files:
-                    fx = OrderedDict()
-                    fx['length'] = x[1]
-                    if self._include_md5:
-                        fx['md5sum'] = x[2]['md5sum']
-                    fx['path'] = x[0].replace(self.path, '')[1:].split(os.sep)
-                    data['info']['files'].append(fx)
-                data['info']['name'] = self.path.split(os.sep)[-1]
-            data['info']['pieces'] = bytes(self._pieces)
-            data['info']['piece length'] = self.piece_size
-            data['info']['private'] = int(self.private)
-            return bencode(data)
+        if getattr(self, '_data', None):
+
+            return bencode(self._data)
         else:
             raise Exception(
-                "Torrent not generated - call generate() before save()")
+                "Torrent not generated - call generate() first")
 
     def save(self, fp):
         """
