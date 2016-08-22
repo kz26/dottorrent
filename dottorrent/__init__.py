@@ -32,7 +32,7 @@ from urllib.parse import urlparse
 
 from bencoder import bencode
 
-from version import __version__
+from .version import __version__
 
 DEFAULT_CREATOR = "dottorrent/{} (https://github.com/kz26/dottorrent)".format(
     __version__)
@@ -52,16 +52,16 @@ class Torrent(object):
                  piece_size=None, private=False, creation_date=None,
                  comment=None, created_by=None):
         """
-        path: path to a file or directory from which to create the torrent
-        trackers: list/iterable of tracker URLs
-        http_seeds: list/iterable of HTTP seed URLs
-        piece_size: Piece size in bytes. Must be >= 16 KB and a power of 2.
-        If None, get_info() will be used to automatically select one.
-        private: The private flag. If True, DHT/PEX will be disabled.
-        creation_date: An optional datetime object representing the torrent creation date.
-        comment: An optional comment string for the torrent.
-        created_by: name/version of the program used to create the .torrent.
-        If None, defaults to the value of DEFAULT_CREATOR.
+        :param path: path to a file or directory from which to create the torrent
+        :param trackers: list/iterable of tracker URLs
+        :param http_seeds: list/iterable of HTTP seed URLs
+        :param piece_size: Piece size in bytes. Must be >= 16 KB and a power of 2.
+            If None, :code:`get_info()` will be used to automatically select a piece size.
+        :param private: The private flag. If True, DHT/PEX will be disabled.
+        :param creation_date: An optional datetime object representing the torrent creation date.
+        :param comment: An optional comment string for the torrent.
+        :param created_by: name/version of the program used to create the .torrent.
+            If None, defaults to the value of :code:`DEFAULT_CREATOR`.
         """
 
         self.path = os.path.normpath(path)
@@ -129,7 +129,8 @@ class Torrent(object):
         Scans the input path and automatically determines the optimal
         piece size (up to 4 MB), along with other basic info such
         as the total size and the total number of files.
-        Returns: (total_size, total_files, piece_size, num_pieces)
+
+        :return: :code:`(total_size, total_files, piece_size, num_pieces)`
         """
         if getattr(self, '_files', None):
             total_size = sum([x[1] for x in self._files])
@@ -158,9 +159,9 @@ class Torrent(object):
     def generate(self, include_md5=False, callback=None):
         """
         Computes and stores piece data.
-        include_md5: If True, also computes and stores MD5 hashes for each file.
-        callback: progress callable with method signature
-        (filename, pieces_completed, pieces_total)
+
+        :param include_md5: If True, also computes and stores MD5 hashes for each file.
+        :param callback: progress callable with method signature :code:`(filename, pieces_completed, pieces_total)`
         """
         self._files = []
         self._include_md5 = include_md5
@@ -258,6 +259,8 @@ class Torrent(object):
         """
         Returns the base32 info hash of the torrent. Useful for generating
         magnet links.
+
+        .. note:: :code:`generate()` must be called first.
         """
         if getattr(self, '_data', None):
             return b32encode(sha1(bencode(self._data['info'])).digest())
@@ -268,8 +271,10 @@ class Torrent(object):
     @property
     def info_hash(self):
         """
-        Returns the SHA-1 info hash of the torrent. Useful for generating
-        magnet links.
+        :return: The SHA-1 info hash of the torrent. Useful for generating
+            magnet links.
+
+        .. note:: :code:`generate()` must be called first.
         """
         if getattr(self, '_data', None):
             return sha1(bencode(self._data['info'])).hexdigest()
@@ -279,7 +284,9 @@ class Torrent(object):
 
     def dump(self):
         """
-        Returns the bencoded torrent data as a byte string.
+        :return: The bencoded torrent data as a byte string.
+
+        .. note:: :code:`generate()` must be called first.
         """
         if getattr(self, '_data', None):
 
@@ -290,6 +297,11 @@ class Torrent(object):
 
     def save(self, fp):
         """
-        Saves the torrent to fp, a file(-like) object.
+        Saves the torrent to :code:`fp`, a file(-like) object
+        opened in binary writing (``wb``) mode.
+
+        .. note:: :code:`generate()` must be called first.
         """
         fp.write(self.dump())
+
+

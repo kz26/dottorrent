@@ -104,5 +104,5 @@ if __name__ == '__main__':
 
     with open(args.output_path, 'wb') as f:
         t.save(f)
-    print("Torrent file saved to {}".format(args.output_path))
     print("Info hash: " + t.info_hash)
+    print("Torrent file saved to {}".format(args.output_path))
