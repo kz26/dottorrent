@@ -6,7 +6,7 @@
 Welcome to dottorrent's documentation!
 ======================================
 
-**dottorrent* is a high-level Python 3 library and command-line interface (CLI) tool
+**dottorrent** is a high-level Python 3 library and command-line interface (CLI) tool
 for creating .torrent files.
 
 Features
