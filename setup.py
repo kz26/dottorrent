@@ -11,7 +11,7 @@ setup(
 
     # Project uses reStructuredText, so ensure that the docutils get
     # installed or upgraded on the target machine
-    install_requires=['bencoder.pyx>=1.1.2', 'humanfriendly', 'tqdm>=4.8.4'],
+    install_requires=['bencoder.pyx>=1.1.1', 'humanfriendly', 'tqdm>=4.8.4'],
 
     # metadata for upload to PyPI
     author="Kevin Zhang",

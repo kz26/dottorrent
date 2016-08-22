@@ -8,7 +8,7 @@ available in your system path.
 
 ::
 
-	usage: dottorrent_cli.py [-h] [--tracker TRACKERS] [--http_seed HTTP_SEEDS]
+	usage: dottorrent_cli.py [-h] [--tracker TRACKER] [--http_seed HTTP_SEED]
 	                         [--piece_size PIECE_SIZE] [--private]
 	                         [--comment COMMENT] [--date DATE] [--md5] [--verbose]
 	                         path output_path
@@ -21,17 +21,18 @@ available in your system path.
 
 	optional arguments:
 	  -h, --help            show this help message and exit
-	  --tracker TRACKERS, -t TRACKERS
+	  --tracker TRACKER, -t TRACKER
 	                        tracker URL (can be specified multiple times)
-	  --http_seed HTTP_SEEDS, -w HTTP_SEEDS
+	  --http_seed HTTP_SEED, -w HTTP_SEED
 	                        HTTP seed URL (can be specified multiple times)
 	  --piece_size PIECE_SIZE, -s PIECE_SIZE
 	                        piece size in bytes
 	  --private, -p         set private flag
 	  --comment COMMENT, -c COMMENT
 	                        free-text string for the torrent comment field
-	  --date DATE, -d DATE  Torrent creation date (unix timestamp)
+	  --date DATE, -d DATE  Torrent creation date. Valid values: unix
+	                        timestamp/none/now (default: now)
 	  --md5                 Add per-file MD5 hashes
 	  --verbose, -v         verbose mode
 
-	dottorrent/1.0.0 (https://github.com/kz26/dottorrent)
+	dottorrent/1.0.1 (https://github.com/kz26/dottorrent)

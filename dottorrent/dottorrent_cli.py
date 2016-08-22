@@ -35,9 +35,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create a .torrent file',
                                      epilog=dottorrent.DEFAULT_CREATOR)
     parser.add_argument('--tracker', '-t', action='append', dest='trackers',
+                        metavar='TRACKER',
                         help='tracker URL (can be specified multiple times)')
     parser.add_argument(
         '--http_seed', '-w', action='append', dest='http_seeds',
+        metavar='HTTP_SEED',
         help='HTTP seed URL (can be specified multiple times)')
     parser.add_argument(
         '--piece_size', '-s', type=int, help='piece size in bytes')
@@ -45,8 +47,9 @@ if __name__ == '__main__':
         '--private', '-p', action='store_true', help='set private flag')
     parser.add_argument('--comment', '-c',
                         help='free-text string for the torrent comment field')
-    parser.add_argument('--date', '-d', type=int,
-                        help='Torrent creation date (unix timestamp)')
+    parser.add_argument('--date', '-d', default='now',
+                        help='Torrent creation date. \
+                        Valid values: unix timestamp/none/now (default: now)')
     parser.add_argument(
         '--md5', action='store_true', help='Add per-file MD5 hashes')
     parser.add_argument(
@@ -55,10 +58,14 @@ if __name__ == '__main__':
         'path', help='path to file/directory to create torrent from')
     parser.add_argument('output_path', help='path to save .torrent file to')
     args = parser.parse_args()
+    
     if args.date:
-        creation_date = datetime.utcfromtimestamp(float(args.date))
-    else:
-        creation_date = None
+        if args.date.isdigit():
+            creation_date = datetime.utcfromtimestamp(float(args.date))
+        elif args.date.lower() == 'none':
+            creation_date = None
+        elif args.date.lower() == 'now':
+            creation_date = datetime.now()
 
     print(dottorrent.DEFAULT_CREATOR)
     print("Input: {}".format(args.path))
