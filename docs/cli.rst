@@ -1,6 +1,9 @@
 Command-line tool
 =================
 
+If you installed dottorrent using pip, ``dottorrent_cli.py`` should be
+available in your system path.
+
 .. highlight:: none
 
 ::
