@@ -6,6 +6,22 @@
 Welcome to dottorrent's documentation!
 ======================================
 
+**dottorrent* is a high-level Python 3 library and command-line interface (CLI) tool
+for creating .torrent files.
+
+Features
+--------
+
+* Fast (capable of several hundred MB/s)
+* Automatic and manual piece size selection
+* HTTP/web seeds support
+* Private flag support
+* Info hash generation for created torrents
+* User-definable comment field, creation date, creator, etc.
+* Per-file MD5 hash inclusion
+
+
+
 Contents:
 
 .. toctree::
