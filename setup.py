@@ -16,8 +16,8 @@ setup(
     # metadata for upload to PyPI
     author="Kevin Zhang",
     author_email="kevin@kevinzhang.me",
-    description="This is an Example Package",
-    license="MIT",
+    description="High-level Python 3 library and CLI tool for creating .torrent files",
+    long_description=open('README.rst').read(),
     keywords="bittorrent torrent bencode",
     url="https://github.com/kz26/dottorrent",   # project home page, if any
 
