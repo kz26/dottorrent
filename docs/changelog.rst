@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.0.2
+-----
+* Raise exception when path is a directory and no files exist
+
 1.0.1
 -----
 

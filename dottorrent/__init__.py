@@ -146,6 +146,8 @@ class Torrent(object):
                     fpath = os.path.normpath(os.path.join(x[0], fn))
                     total_size += os.path.getsize(fpath)
                     total_files += 1
+            if not total_files:
+                raise Exception("No files found in {}".format(self.path))
         if self.piece_size:
             ps = self.piece_size
         else:
@@ -174,6 +176,8 @@ class Torrent(object):
                     fpath = os.path.normpath(os.path.join(x[0], fn))
                     fsize = os.path.getsize(fpath)
                     self._files.append((fpath, fsize, {}))
+            if not len(self._files):
+                raise Exception("No files found in {}".format(self.path))
         total_size = sum([x[1] for x in self._files])
         # set piece size if not already set
         if self.piece_size is None:
