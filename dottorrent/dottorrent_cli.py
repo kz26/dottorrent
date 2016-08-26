@@ -58,7 +58,7 @@ if __name__ == '__main__':
         'path', help='path to file/directory to create torrent from')
     parser.add_argument('output_path', help='path to save .torrent file to')
     args = parser.parse_args()
-    
+
     if args.date:
         if args.date.isdigit():
             creation_date = datetime.utcfromtimestamp(float(args.date))
@@ -75,7 +75,8 @@ if __name__ == '__main__':
                            piece_size=args.piece_size,
                            private=args.private,
                            comment=args.comment,
-                           creation_date=creation_date
+                           creation_date=creation_date,
+                           include_md5=args.md5
                            )
     t_info = t.get_info()
     print("Files: {}".format(t_info[1]))
@@ -106,7 +107,8 @@ if __name__ == '__main__':
         elif args.verbose > 1:
             print("{}/{} {}".format(pieces_completed, total_pieces, fn))
         pbar.update(t_info[2] / 1048576)
-    t.generate(include_md5=args.md5, callback=progress_callback)
+
+    t.generate(callback=progress_callback)
     pbar.close()
 
     with open(args.output_path, 'wb') as f:

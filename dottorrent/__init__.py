@@ -50,18 +50,19 @@ class Torrent(object):
 
     def __init__(self, path, trackers=None, http_seeds=None,
                  piece_size=None, private=False, creation_date=None,
-                 comment=None, created_by=None):
+                 comment=None, created_by=None, include_md5=False):
         """
         :param path: path to a file or directory from which to create the torrent
         :param trackers: list/iterable of tracker URLs
         :param http_seeds: list/iterable of HTTP seed URLs
         :param piece_size: Piece size in bytes. Must be >= 16 KB and a power of 2.
-            If None, :code:`get_info()` will be used to automatically select a piece size.
+            If None, ``get_info()`` will be used to automatically select a piece size.
         :param private: The private flag. If True, DHT/PEX will be disabled.
         :param creation_date: An optional datetime object representing the torrent creation date.
         :param comment: An optional comment string for the torrent.
         :param created_by: name/version of the program used to create the .torrent.
-            If None, defaults to the value of :code:`DEFAULT_CREATOR`.
+            If None, defaults to the value of ``DEFAULT_CREATOR``.
+        :param include_md5: If True, also computes and stores MD5 hashes for each file.
         """
 
         self.path = os.path.normpath(path)
@@ -72,6 +73,7 @@ class Torrent(object):
         self.creation_date = creation_date
         self.comment = comment
         self.created_by = created_by
+        self.include_md5 = include_md5
 
     @property
     def trackers(self):
@@ -128,14 +130,12 @@ class Torrent(object):
         """
         Scans the input path and automatically determines the optimal
         piece size (up to 4 MB), along with other basic info such
-        as the total size and the total number of files.
+        as the total size and the total number of files. If ``piece_size``
+        has already been set, the custom value will be used instead.
 
-        :return: :code:`(total_size, total_files, piece_size, num_pieces)`
+        :return: ``(total_size, total_files, piece_size, num_pieces)``
         """
-        if getattr(self, '_files', None):
-            total_size = sum([x[1] for x in self._files])
-            total_files = len(self._files)
-        elif os.path.isfile(self.path):
+        if os.path.isfile(self.path):
             total_size = os.path.getsize(self.path)
             total_files = 1
         else:
@@ -158,56 +158,62 @@ class Torrent(object):
                 ps = MAX_PIECE_SIZE
         return (total_size, total_files, ps, math.ceil(total_size / ps))
 
-    def generate(self, include_md5=False, callback=None):
+    def generate(self, callback=None):
         """
         Computes and stores piece data.
 
-        :param include_md5: If True, also computes and stores MD5 hashes for each file.
-        :param callback: progress callable with method signature :code:`(filename, pieces_completed, pieces_total)`
+        :param callback: progress/cancellation callable with method
+            signature ``(filename, pieces_completed, pieces_total)``.
+            Useful for reporting progress if dottorrent is used in a
+            GUI/threaded context, and if torrent generation needs to be cancelled.
+            The callable's return value should evaluate to ``True`` to trigger
+            cancellation.
         """
-        self._files = []
-        self._include_md5 = include_md5
+        files = []
         self._single_file = os.path.isfile(self.path)
         if self._single_file:
-            self._files.append((self.path, os.path.getsize(self.path), {}))
+            files.append((self.path, os.path.getsize(self.path), {}))
         else:
             for x in os.walk(self.path):
                 for fn in x[2]:
                     fpath = os.path.normpath(os.path.join(x[0], fn))
                     fsize = os.path.getsize(fpath)
-                    self._files.append((fpath, fsize, {}))
-            if not len(self._files):
+                    files.append((fpath, fsize, {}))
+            if not len(files):
                 raise Exception("No files found in {}".format(self.path))
-        total_size = sum([x[1] for x in self._files])
+        total_size = sum([x[1] for x in files])
         # set piece size if not already set
         if self.piece_size is None:
             self.piece_size = self.get_info()[2]
-        if self._files:
+        if files:
             self._pieces = bytearray()
             i = 0
             num_pieces = math.ceil(total_size / self.piece_size)
             pc = 0
             buf = bytearray()
-            while i < len(self._files):
-                fe = self._files[i]
+            while i < len(files):
+                fe = files[i]
                 f = open(fe[0], 'rb')
-                if include_md5:
+                if self.include_md5:
                     md5_hasher = md5()
                 else:
                     md5_hasher = None
                 for chunk in iter(lambda: f.read(self.piece_size), b''):
                     buf += chunk
                     if len(buf) >= self.piece_size \
-                            or i == len(self._files)-1:
+                            or i == len(files)-1:
                         piece = buf[:self.piece_size]
                         self._pieces += sha1(piece).digest()
                         del buf[:self.piece_size]
                         pc += 1
                         if callback:
-                            callback(fe[0], pc, num_pieces)
-                    if include_md5:
+                            cancel = callback(fe[0], pc, num_pieces)
+                            if cancel:
+                                f.close()
+                                return
+                    if self.include_md5:
                         md5_hasher.update(chunk)
-                if include_md5:
+                if self.include_md5:
                     fe[2]['md5sum'] = md5_hasher.hexdigest()
                 f.close()
                 i += 1
@@ -218,7 +224,9 @@ class Torrent(object):
                 del buf[:self.piece_size]
                 pc += 1
                 if callback:
-                    callback(fe[0], pc, num_pieces)
+                    cancel = callback(fe[0], pc, num_pieces)
+                    if cancel:
+                        return
 
         # Create the torrent data structure
         data = OrderedDict()
@@ -238,16 +246,16 @@ class Torrent(object):
             data['httpseeds'] = self.http_seeds
         data['info'] = OrderedDict()
         if self._single_file:
-            data['info']['length'] = self._files[0][1]
-            if self._include_md5:
-                data['info']['md5sum'] = self._files[0][2]['md5sum']
-            data['info']['name'] = self._files[0][0].split(os.sep)[-1]
+            data['info']['length'] = files[0][1]
+            if self.include_md5:
+                data['info']['md5sum'] = files[0][2]['md5sum']
+            data['info']['name'] = files[0][0].split(os.sep)[-1]
         else:
             data['info']['files'] = []
-            for x in self._files:
+            for x in files:
                 fx = OrderedDict()
                 fx['length'] = x[1]
-                if self._include_md5:
+                if self.include_md5:
                     fx['md5sum'] = x[2]['md5sum']
                 fx['path'] = x[0].replace(self.path, '')[1:].split(os.sep)
                 data['info']['files'].append(fx)
@@ -257,6 +265,7 @@ class Torrent(object):
         data['info']['private'] = int(self.private)
 
         self._data = data
+        return
 
     @property
     def info_hash_base32(self):
@@ -264,7 +273,7 @@ class Torrent(object):
         Returns the base32 info hash of the torrent. Useful for generating
         magnet links.
 
-        .. note:: :code:`generate()` must be called first.
+        .. note:: ``generate()`` must be called first.
         """
         if getattr(self, '_data', None):
             return b32encode(sha1(bencode(self._data['info'])).digest())
@@ -278,7 +287,7 @@ class Torrent(object):
         :return: The SHA-1 info hash of the torrent. Useful for generating
             magnet links.
 
-        .. note:: :code:`generate()` must be called first.
+        .. note:: ``generate()`` must be called first.
         """
         if getattr(self, '_data', None):
             return sha1(bencode(self._data['info'])).hexdigest()
@@ -290,7 +299,7 @@ class Torrent(object):
         """
         :return: The bencoded torrent data as a byte string.
 
-        .. note:: :code:`generate()` must be called first.
+        .. note:: ``generate()`` must be called first.
         """
         if getattr(self, '_data', None):
 
@@ -301,11 +310,9 @@ class Torrent(object):
 
     def save(self, fp):
         """
-        Saves the torrent to :code:`fp`, a file(-like) object
+        Saves the torrent to ``fp``, a file(-like) object
         opened in binary writing (``wb``) mode.
 
-        .. note:: :code:`generate()` must be called first.
+        .. note:: ``generate()`` must be called first.
         """
         fp.write(self.dump())
-
-
