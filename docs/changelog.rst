@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.1.1
+-----
+* Return True/False in generate()
+
 1.1.0
 -----
 * Move include_md5 option to Torrent constructor

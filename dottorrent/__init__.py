@@ -160,7 +160,8 @@ class Torrent(object):
 
     def generate(self, callback=None):
         """
-        Computes and stores piece data.
+        Computes and stores piece data. Returns ``True`` on success, ``False``
+        otherwise.
 
         :param callback: progress/cancellation callable with method
             signature ``(filename, pieces_completed, pieces_total)``.
@@ -170,8 +171,8 @@ class Torrent(object):
             cancellation.
         """
         files = []
-        self._single_file = os.path.isfile(self.path)
-        if self._single_file:
+        single_file = os.path.isfile(self.path)
+        if single_file:
             files.append((self.path, os.path.getsize(self.path), {}))
         else:
             for x in os.walk(self.path):
@@ -210,7 +211,7 @@ class Torrent(object):
                             cancel = callback(fe[0], pc, num_pieces)
                             if cancel:
                                 f.close()
-                                return
+                                return False
                     if self.include_md5:
                         md5_hasher.update(chunk)
                 if self.include_md5:
@@ -226,7 +227,7 @@ class Torrent(object):
                 if callback:
                     cancel = callback(fe[0], pc, num_pieces)
                     if cancel:
-                        return
+                        return False
 
         # Create the torrent data structure
         data = OrderedDict()
@@ -245,7 +246,7 @@ class Torrent(object):
         if self.http_seeds:
             data['httpseeds'] = self.http_seeds
         data['info'] = OrderedDict()
-        if self._single_file:
+        if single_file:
             data['info']['length'] = files[0][1]
             if self.include_md5:
                 data['info']['md5sum'] = files[0][2]['md5sum']
@@ -265,7 +266,7 @@ class Torrent(object):
         data['info']['private'] = int(self.private)
 
         self._data = data
-        return
+        return True
 
     @property
     def info_hash_base32(self):
