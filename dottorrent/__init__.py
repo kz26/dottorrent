@@ -232,25 +232,25 @@ class Torrent(object):
         # Create the torrent data structure
         data = OrderedDict()
         if len(self.trackers) == 1:
-            data['announce'] = self.trackers[0]
+            data['announce'] = self.trackers[0].encode()
         elif len(self.trackers) > 1:
-            data['announce-list'] = [[x] for x in self.trackers]
+            data['announce-list'] = [[x.encode()] for x in self.trackers]
         if self.comment:
-            data['comment'] = self.comment
+            data['comment'] = self.comment.encode()
         if self.created_by:
-            data['created by'] = self.created_by
+            data['created by'] = self.created_by.encode()
         else:
-            data['created by'] = DEFAULT_CREATOR
+            data['created by'] = DEFAULT_CREATOR.encode()
         if self.creation_date:
             data['creation date'] = int(self.creation_date.timestamp())
         if self.web_seeds:
-            data['url-list'] = self.web_seeds
+            data['url-list'] = [x.encode() for x in self.web_seeds]
         data['info'] = OrderedDict()
         if single_file:
             data['info']['length'] = files[0][1]
             if self.include_md5:
                 data['info']['md5sum'] = files[0][2]['md5sum']
-            data['info']['name'] = files[0][0].split(os.sep)[-1]
+            data['info']['name'] = files[0][0].split(os.sep)[-1].encode()
         else:
             data['info']['files'] = []
             for x in files:
@@ -258,9 +258,11 @@ class Torrent(object):
                 fx['length'] = x[1]
                 if self.include_md5:
                     fx['md5sum'] = x[2]['md5sum']
-                fx['path'] = x[0].replace(self.path, '')[1:].split(os.sep)
+                fx['path'] = [y.encode()
+                              for y in x[0].replace(self.path, '')[1:]
+                              .split(os.sep)]
                 data['info']['files'].append(fx)
-            data['info']['name'] = self.path.split(os.sep)[-1]
+            data['info']['name'] = self.path.split(os.sep)[-1].encode()
         data['info']['pieces'] = bytes(self._pieces)
         data['info']['piece length'] = self.piece_size
         data['info']['private'] = int(self.private)

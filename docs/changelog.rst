@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.3.0
+-----
+* Unicode support
+
 1.2.2
 -----
 * Fix auto piece sizing in generate() with small files 
