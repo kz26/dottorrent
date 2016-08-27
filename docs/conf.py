@@ -64,7 +64,9 @@ author = 'Kevin Zhang'
 # built documents.
 #
 # The short X.Y version.
-version = '1.1.1'
+with open('../dottorrent/version.py') as f:
+    exec(f.read())
+version = __version__
 # The full version, including alpha/beta/rc tags.
 release = version
 

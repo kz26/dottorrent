@@ -38,9 +38,9 @@ if __name__ == '__main__':
                         metavar='TRACKER',
                         help='tracker URL (can be specified multiple times)')
     parser.add_argument(
-        '--http_seed', '-w', action='append', dest='http_seeds',
-        metavar='HTTP_SEED',
-        help='HTTP seed URL (can be specified multiple times)')
+        '--web_seed', '-w', action='append', dest='web_seeds',
+        metavar='WEB_SEED',
+        help='web seed URL (can be specified multiple times)')
     parser.add_argument(
         '--piece_size', '-s', type=int, help='piece size in bytes')
     parser.add_argument(
@@ -71,7 +71,7 @@ if __name__ == '__main__':
     print("Input: {}".format(args.path))
     t = dottorrent.Torrent(args.path,
                            trackers=args.trackers,
-                           http_seeds=args.http_seeds,
+                           web_seeds=args.web_seeds,
                            piece_size=args.piece_size,
                            private=args.private,
                            comment=args.comment,
@@ -86,8 +86,8 @@ if __name__ == '__main__':
     print("MD5 hashing: {}".format(args.md5))
     for x in t.trackers:
         print("Tracker: " + x)
-    for x in t.http_seeds:
-        print("HTTP seed: " + x)
+    for x in t.web_seeds:
+        print("Web seed: " + x)
     print("Private torrent: {}".format(args.private))
     if args.comment:
         print("Comment: " + t.comment)

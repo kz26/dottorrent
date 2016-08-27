@@ -14,8 +14,8 @@ Features
 
 * Fast (capable of several hundred MB/s)
 * Automatic and manual piece size selection
-* HTTP/web seeds support
-* Private flag support
+* HTTP/web seeds support `(BEP 19) <http://www.bittorrent.org/beps/bep_0019.html>`_
+* Private flag support `(BEP 27) <http://www.bittorrent.org/beps/bep_0027.html>`_
 * Info hash generation for created torrents
 * User-definable comment field, creation date, creator, etc.
 * Per-file MD5 hash inclusion

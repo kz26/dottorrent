@@ -48,13 +48,13 @@ def print_err(v):
 
 class Torrent(object):
 
-    def __init__(self, path, trackers=None, http_seeds=None,
+    def __init__(self, path, trackers=None, web_seeds=None,
                  piece_size=None, private=False, creation_date=None,
                  comment=None, created_by=None, include_md5=False):
         """
         :param path: path to a file or directory from which to create the torrent
         :param trackers: list/iterable of tracker URLs
-        :param http_seeds: list/iterable of HTTP seed URLs
+        :param web_seeds: list/iterable of HTTP/FTP seed URLs
         :param piece_size: Piece size in bytes. Must be >= 16 KB and a power of 2.
             If None, ``get_info()`` will be used to automatically select a piece size.
         :param private: The private flag. If True, DHT/PEX will be disabled.
@@ -67,7 +67,7 @@ class Torrent(object):
 
         self.path = os.path.normpath(path)
         self.trackers = trackers
-        self.http_seeds = http_seeds
+        self.web_seeds = web_seeds
         self.piece_size = piece_size
         self.private = private
         self.creation_date = creation_date
@@ -92,11 +92,11 @@ class Torrent(object):
         self._trackers = tl
 
     @property
-    def http_seeds(self):
-        return self._http_seeds
+    def web_seeds(self):
+        return self._web_seeds
 
-    @http_seeds.setter
-    def http_seeds(self, value):
+    @web_seeds.setter
+    def web_seeds(self, value):
         tl = []
         if value:
             for t in value:
@@ -105,7 +105,7 @@ class Torrent(object):
                     tl.append(t)
                 else:
                     raise Exception("{} is not a valid URL".format(t))
-        self._http_seeds = tl
+        self._web_seeds = tl
 
     @property
     def piece_size(self):
@@ -243,8 +243,8 @@ class Torrent(object):
             data['created by'] = DEFAULT_CREATOR
         if self.creation_date:
             data['creation date'] = int(self.creation_date.timestamp())
-        if self.http_seeds:
-            data['httpseeds'] = self.http_seeds
+        if self.web_seeds:
+            data['url-list'] = self.web_seeds
         data['info'] = OrderedDict()
         if single_file:
             data['info']['length'] = files[0][1]

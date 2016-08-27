@@ -8,10 +8,10 @@ available in your system path.
 
 ::
 
-	usage: dottorrent_cli.py [-h] [--tracker TRACKER] [--http_seed HTTP_SEED]
-	                         [--piece_size PIECE_SIZE] [--private]
-	                         [--comment COMMENT] [--date DATE] [--md5] [--verbose]
-	                         path output_path
+	usage: dottorrent_cli.py [-h] [--tracker TRACKER] [--web_seed WEB_SEED]
+                         [--piece_size PIECE_SIZE] [--private]
+                         [--comment COMMENT] [--date DATE] [--md5] [--verbose]
+                         path output_path
 
 	Create a .torrent file
 
@@ -23,8 +23,8 @@ available in your system path.
 	  -h, --help            show this help message and exit
 	  --tracker TRACKER, -t TRACKER
 	                        tracker URL (can be specified multiple times)
-	  --http_seed HTTP_SEED, -w HTTP_SEED
-	                        HTTP seed URL (can be specified multiple times)
+	  --web_seed WEB_SEED, -w WEB_SEED
+	                        web seed URL (can be specified multiple times)
 	  --piece_size PIECE_SIZE, -s PIECE_SIZE
 	                        piece size in bytes
 	  --private, -p         set private flag
@@ -35,4 +35,4 @@ available in your system path.
 	  --md5                 Add per-file MD5 hashes
 	  --verbose, -v         verbose mode
 
-	dottorrent/1.0.1 (https://github.com/kz26/dottorrent)
+	dottorrent/1.2.0 (https://github.com/kz26/dottorrent)
