@@ -151,7 +151,7 @@ class Torrent(object):
         if self.piece_size:
             ps = self.piece_size
         else:
-            ps = 1 << math.max(0, math.ceil(math.log(total_size / 1500, 2)))
+            ps = 1 << max(0, math.ceil(math.log(total_size / 1500, 2)))
             if ps < MIN_PIECE_SIZE:
                 ps = MIN_PIECE_SIZE
             if ps > MAX_PIECE_SIZE:

@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.2.1
+1.2.2
 -----
 * Fix auto piece sizing in generate() with small files 
 
