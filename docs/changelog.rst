@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.2.1
+-----
+* Fix auto piece sizing in generate() with small files 
+
 1.2.0
 -----
 * Switch to BEP 19 (GetRight style) web seeds
