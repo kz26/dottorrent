@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.4.1
+-----
+* Ignore empty files in get_info() and generate()
+
 1.4.0
 -----
 * Use custom exceptions (see exceptions.py)

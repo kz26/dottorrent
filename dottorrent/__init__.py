@@ -147,8 +147,10 @@ class Torrent(object):
             for x in os.walk(self.path):
                 for fn in x[2]:
                     fpath = os.path.normpath(os.path.join(x[0], fn))
-                    total_size += os.path.getsize(fpath)
-                    total_files += 1
+                    fsize = os.path.getsize(fpath)
+                    if fsize:
+                        total_size += fsize
+                        total_files += 1
         if not (total_files and total_size):
             raise exceptions.EmptyInputException
         if self.piece_size:
@@ -182,7 +184,8 @@ class Torrent(object):
                 for fn in x[2]:
                     fpath = os.path.normpath(os.path.join(x[0], fn))
                     fsize = os.path.getsize(fpath)
-                    files.append((fpath, fsize, {}))
+                    if fsize:
+                        files.append((fpath, fsize, {}))
         total_size = sum([x[1] for x in files])
         if not (len(files) and total_size):
             raise exceptions.EmptyInputException
