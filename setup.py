@@ -7,7 +7,7 @@ setup(
     name="dottorrent",
     version=__version__,
     packages=find_packages(),
-    scripts=['dottorrent/dottorrent_cli.py'],
+    scripts=['bin/dottorrent_cli'],
 
     # Project uses reStructuredText, so ensure that the docutils get
     # installed or upgraded on the target machine

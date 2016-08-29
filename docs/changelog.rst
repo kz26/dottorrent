@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.4.2
+-----
+* Rename dottorrent_cli.py to dottorrent_cli
+
 1.4.1
 -----
 * Ignore empty files in get_info() and generate()

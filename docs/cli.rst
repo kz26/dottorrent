@@ -1,17 +1,17 @@
 Command-line tool
 =================
 
-If you installed dottorrent using pip, ``dottorrent_cli.py`` should be
+If you installed dottorrent using pip, ``dottorrent_cli`` should be
 available in your system path.
 
 .. highlight:: none
 
 ::
 
-	usage: dottorrent_cli.py [-h] [--tracker TRACKER] [--web_seed WEB_SEED]
-                         [--piece_size PIECE_SIZE] [--private]
-                         [--comment COMMENT] [--date DATE] [--md5] [--verbose]
-                         path output_path
+	usage: dottorrent_cli [-h] [--tracker TRACKER] [--web_seed WEB_SEED]
+                      [--piece_size PIECE_SIZE] [--private]
+                      [--comment COMMENT] [--date DATE] [--md5] [--verbose]
+                      path output_path
 
 	Create a .torrent file
 
@@ -35,4 +35,5 @@ available in your system path.
 	  --md5                 Add per-file MD5 hashes
 	  --verbose, -v         verbose mode
 
-	dottorrent/1.2.0 (https://github.com/kz26/dottorrent)
+	dottorrent/1.4.2 (https://github.com/kz26/dottorrent)
+
