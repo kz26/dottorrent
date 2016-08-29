@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.4.0
+-----
+* Use custom exceptions (see exceptions.py)
+* Add check for empty input
+
 1.3.0
 -----
 * Unicode support

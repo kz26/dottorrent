@@ -33,6 +33,7 @@ from urllib.parse import urlparse
 from bencoder import bencode
 
 from .version import __version__
+from . import exceptions
 
 DEFAULT_CREATOR = "dottorrent/{} (https://github.com/kz26/dottorrent)".format(
     __version__)
@@ -88,7 +89,7 @@ class Torrent(object):
                 if pr.scheme and pr.netloc:
                     tl.append(t)
                 else:
-                    raise Exception("{} is not a valid URL".format(t))
+                    raise exceptions.InvalidURLException(t)
         self._trackers = tl
 
     @property
@@ -104,7 +105,7 @@ class Torrent(object):
                 if pr.scheme and pr.netloc:
                     tl.append(t)
                 else:
-                    raise Exception("{} is not a valid URL".format(t))
+                    raise exceptions.InvalidURLException(t)
         self._web_seeds = tl
 
     @property
@@ -117,12 +118,14 @@ class Torrent(object):
             value = int(value)
             if value > 0 and (value & (value-1) == 0):
                 if value < MIN_PIECE_SIZE:
-                    raise Exception("Piece size should be at least 16 KB")
+                    raise exceptions.InvalidPieceSizeException(
+                        "Piece size should be at least 16 KB")
                 if value > MAX_PIECE_SIZE:
                     print_err("Warning: piece size is greater than 4 MB")
                 self._piece_size = value
             else:
-                raise Exception("Piece size must be a power of 2")
+                raise exceptions.InvalidPieceSizeException(
+                    "Piece size must be a power of 2")
         else:
             self._piece_size = None
 
@@ -146,8 +149,8 @@ class Torrent(object):
                     fpath = os.path.normpath(os.path.join(x[0], fn))
                     total_size += os.path.getsize(fpath)
                     total_files += 1
-            if not total_files:
-                raise Exception("No files found in {}".format(self.path))
+        if not (total_files and total_size):
+            raise exceptions.EmptyInputException
         if self.piece_size:
             ps = self.piece_size
         else:
@@ -180,9 +183,9 @@ class Torrent(object):
                     fpath = os.path.normpath(os.path.join(x[0], fn))
                     fsize = os.path.getsize(fpath)
                     files.append((fpath, fsize, {}))
-            if not len(files):
-                raise Exception("No files found in {}".format(self.path))
         total_size = sum([x[1] for x in files])
+        if not (len(files) and total_size):
+            raise exceptions.EmptyInputException
         # set piece size if not already set
         if self.piece_size is None:
             self.piece_size = self.get_info()[2]
@@ -281,8 +284,7 @@ class Torrent(object):
         if getattr(self, '_data', None):
             return b32encode(sha1(bencode(self._data['info'])).digest())
         else:
-            raise Exception(
-                "Torrent not generated - call generate() first")
+            raise exceptions.TorrentNotGeneratedException
 
     @property
     def info_hash(self):
@@ -295,8 +297,7 @@ class Torrent(object):
         if getattr(self, '_data', None):
             return sha1(bencode(self._data['info'])).hexdigest()
         else:
-            raise Exception(
-                "Torrent not generated - call generate() first")
+            raise exceptions.TorrentNotGeneratedException
 
     def dump(self):
         """
@@ -308,8 +309,7 @@ class Torrent(object):
 
             return bencode(self._data)
         else:
-            raise Exception(
-                "Torrent not generated - call generate() first")
+            raise exceptions.TorrentNotGeneratedException
 
     def save(self, fp):
         """
