@@ -23,6 +23,7 @@
 # SOFTWARE.
 
 import argparse
+import os.path
 from datetime import datetime
 
 from humanfriendly import format_size
@@ -111,8 +112,16 @@ if __name__ == '__main__':
 
     t.generate(callback=progress_callback)
     pbar.close()
+    
+    if os.path.isdir(args.output_path):
+        last_part = os.path.basename(args.path)
+        no_ext = os.path.splitext(last_part)[0]
+    
+        save_name = os.path.join(args.output_path, '{}.torrent'.format(no_ext))
+    else:
+        save_name = args.output_path
 
-    with open(args.output_file, 'wb') as f:
+    with open(save_name, 'wb') as f:
         t.save(f)
     print("Info hash: " + t.info_hash)
     print("Torrent file saved to {}".format(args.output_file))
