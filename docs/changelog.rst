@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.4.3
+-----
+* dottorrent_cli: Change output_path to output_file for clarity
+
 1.4.2
 -----
 * Rename dottorrent_cli.py to dottorrent_cli

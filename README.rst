@@ -20,6 +20,10 @@ Stable releases are available on PyPI and can be installed using ``pip``.
 
 	pip install dottorrent
 
+
+To install from the latest development sources, clone the git repo and run
+``pip install .``
+
 License
 -------
 

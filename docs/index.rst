@@ -31,6 +31,7 @@ Contents:
    install
    library
    cli
+   dottorrent-gui
    changelog
 
 

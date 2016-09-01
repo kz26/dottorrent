@@ -56,7 +56,8 @@ if __name__ == '__main__':
         '--verbose', '-v', action='count', default=0, help='verbose mode')
     parser.add_argument(
         'path', help='path to file/directory to create torrent from')
-    parser.add_argument('output_path', help='path to save .torrent file to')
+    parser.add_argument(
+        'output_file', help='Output filename for created .torrent file')
     args = parser.parse_args()
 
     if args.date:
@@ -111,7 +112,7 @@ if __name__ == '__main__':
     t.generate(callback=progress_callback)
     pbar.close()
 
-    with open(args.output_path, 'wb') as f:
+    with open(args.output_file, 'wb') as f:
         t.save(f)
     print("Info hash: " + t.info_hash)
-    print("Torrent file saved to {}".format(args.output_path))
+    print("Torrent file saved to {}".format(args.output_file))
