@@ -58,7 +58,9 @@ if __name__ == '__main__':
     parser.add_argument(
         'path', help='path to file/directory to create torrent from')
     parser.add_argument(
-        'output_file', help='Output filename for created .torrent file')
+        'output_path', help='Output path for created .torrent file. \
+        If a directory is provided, the filename will be automatically \
+        generated based on the input.')
     args = parser.parse_args()
 
     if args.date:
@@ -112,16 +114,15 @@ if __name__ == '__main__':
 
     t.generate(callback=progress_callback)
     pbar.close()
-    
-    if os.path.isdir(args.output_path):
-        last_part = os.path.basename(args.path)
-        no_ext = os.path.splitext(last_part)[0]
-    
-        save_name = os.path.join(args.output_path, '{}.torrent'.format(no_ext))
-    else:
-        save_name = args.output_path
 
-    with open(save_name, 'wb') as f:
+    output_path = os.path.normpath(args.output_path)
+    if os.path.isdir(output_path):
+        path_base = os.path.splitext(os.path.basename(t.path))[0]
+        save_fn = os.path.join(args.output_path, path_base + '.torrent')
+    else:
+        save_fn = args.output_path
+
+    with open(save_fn, 'wb') as f:
         t.save(f)
     print("Info hash: " + t.info_hash)
-    print("Torrent file saved to {}".format(args.output_file))
+    print("Torrent file saved to {}".format(save_fn))

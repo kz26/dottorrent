@@ -11,13 +11,15 @@ available in your system path.
 	usage: dottorrent_cli [-h] [--tracker TRACKER] [--web_seed WEB_SEED]
 	                      [--piece_size PIECE_SIZE] [--private]
 	                      [--comment COMMENT] [--date DATE] [--md5] [--verbose]
-	                      path output_file
+	                      path output_path
 
 	Create a .torrent file
 
 	positional arguments:
 	  path                  path to file/directory to create torrent from
-	  output_file           Output filename for created .torrent file
+	  output_path           Output path for created .torrent file. If a directory
+	                        is provided, the filename will be automatically
+	                        generated based on the input.
 
 	optional arguments:
 	  -h, --help            show this help message and exit
@@ -35,7 +37,8 @@ available in your system path.
 	  --md5                 Add per-file MD5 hashes
 	  --verbose, -v         verbose mode
 
-	dottorrent/1.4.3 (https://github.com/kz26/dottorrent)
+	dottorrent/1.5.0 (https://github.com/kz26/dottorrent)
+
 
 
 To add multiple trackers and/or web seeds, repeat the ``-t`` and ``-w`` as many times as necessary,

@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.5.0
+-----
+* Allow both file and directory names to be specified for output_path (PR #1, @mahkitah)
+
 1.4.3
 -----
 * dottorrent_cli: Change output_path to output_file for clarity
