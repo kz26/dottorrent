@@ -265,7 +265,7 @@ class Torrent(object):
                 if self.include_md5:
                     fx['md5sum'] = x[2]['md5sum']
                 fx['path'] = [y.encode()
-                              for y in x[0].replace(self.path, '')[1:]
+                              for y in x[0].replace(self.path, '', 1)[1:]
                               .split(os.sep)]
                 data['info']['files'].append(fx)
             data['info']['name'] = self.path.split(os.sep)[-1].encode()
