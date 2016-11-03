@@ -37,7 +37,7 @@ available in your system path.
 	  --md5                 Add per-file MD5 hashes
 	  --verbose, -v         verbose mode
 
-	dottorrent/1.5.0 (https://github.com/kz26/dottorrent)
+	dottorrent/1.5.1 (https://github.com/kz26/dottorrent)
 
 
 

@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.5.1
+-----
+* Fix filename clobbering when filename contains parent path string (issue #2)
+
 1.5.0
 -----
 * Allow both file and directory names to be specified for output_path (PR #1, @mahkitah)
