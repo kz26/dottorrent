@@ -84,8 +84,8 @@ if __name__ == '__main__':
                            )
     t_info = t.get_info()
     print("Files: {}".format(t_info[1]))
-    print("Total size: {}".format(format_size(t_info[0])))
-    print("Piece size: {}".format(format_size(t_info[2])))
+    print("Total size: {}".format(format_size(t_info[0], binary=True)))
+    print("Piece size: {}".format(format_size(t_info[2], binary=True)))
     print("Pieces: {}".format(t_info[3]))
     print("MD5 hashing: {}".format(args.md5))
     for x in t.trackers:

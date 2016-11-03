@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.5.2
+-----
+* Use humanfriendly.format_size in binary mode
+* Pin major versions of dependencies in requirements.txt and setup.py
+
 1.5.1
 -----
 * Fix filename clobbering when filename contains parent path string (issue #2)
