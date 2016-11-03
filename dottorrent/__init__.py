@@ -141,7 +141,7 @@ class Torrent(object):
         if os.path.isfile(self.path):
             total_size = os.path.getsize(self.path)
             total_files = 1
-        else:
+        elif os.path.exists(self.path):
             total_size = 0
             total_files = 0
             for x in os.walk(self.path):
@@ -151,6 +151,8 @@ class Torrent(object):
                     if fsize:
                         total_size += fsize
                         total_files += 1
+        else:
+            raise exceptions.InvalidInputException
         if not (total_files and total_size):
             raise exceptions.EmptyInputException
         if self.piece_size:
@@ -179,13 +181,15 @@ class Torrent(object):
         single_file = os.path.isfile(self.path)
         if single_file:
             files.append((self.path, os.path.getsize(self.path), {}))
-        else:
+        elif os.path.exists(self.path):
             for x in os.walk(self.path):
                 for fn in x[2]:
                     fpath = os.path.normpath(os.path.join(x[0], fn))
                     fsize = os.path.getsize(fpath)
                     if fsize:
                         files.append((fpath, fsize, {}))
+        else:
+            raise exceptions.InvalidInputException
         total_size = sum([x[1] for x in files])
         if not (len(files) and total_size):
             raise exceptions.EmptyInputException
@@ -259,15 +263,16 @@ class Torrent(object):
             data['info']['name'] = files[0][0].split(os.sep)[-1].encode()
         else:
             data['info']['files'] = []
+            path_sp = self.path.split(os.sep)
             for x in files:
                 fx = OrderedDict()
                 fx['length'] = x[1]
                 if self.include_md5:
                     fx['md5sum'] = x[2]['md5sum']
                 fx['path'] = [y.encode()
-                              for y in x[0].split(os.sep)[1:]]
+                              for y in x[0].split(os.sep)[len(path_sp):]]
                 data['info']['files'].append(fx)
-            data['info']['name'] = self.path.split(os.sep)[-1].encode()
+            data['info']['name'] = path_sp[-1].encode()
         data['info']['pieces'] = bytes(self._pieces)
         data['info']['piece length'] = self.piece_size
         data['info']['private'] = int(self.private)

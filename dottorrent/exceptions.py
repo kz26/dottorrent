@@ -4,6 +4,12 @@ class EmptyInputException(Exception):
         super().__init__('Input path must be non-empty')
 
 
+class InvalidInputException(Exception):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__('Input path is invalid')
+
+
 class InvalidURLException(Exception):
 
     def __init__(self, url, *args, **kwargs):

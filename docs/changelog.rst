@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.5.3
+-----
+* Use relative paths instead of absolute paths for directory mode path generation
+* Add invalid input path check in get_info() and generate()
+
 1.5.2
 -----
 * Use humanfriendly.format_size in binary mode
