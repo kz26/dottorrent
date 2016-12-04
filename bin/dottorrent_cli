@@ -61,6 +61,8 @@ if __name__ == '__main__':
         'output_path', help='Output path for created .torrent file. \
         If a directory is provided, the filename will be automatically \
         generated based on the input.')
+    parser.add_argument(
+        '--source', help='Set source string')
     args = parser.parse_args()
 
     if args.date:
@@ -80,7 +82,8 @@ if __name__ == '__main__':
                            private=args.private,
                            comment=args.comment,
                            creation_date=creation_date,
-                           include_md5=args.md5
+                           include_md5=args.md5,
+                           source=args.source
                            )
     t_info = t.get_info()
     print("Files: {}".format(t_info[1]))
@@ -97,6 +100,8 @@ if __name__ == '__main__':
         print("Comment: " + t.comment)
     if creation_date:
         print("Creation date: {}".format(creation_date))
+    if args.source:
+        print("Source: " + t.source)
 
     pbar = tqdm(
         total=t_info[2] * t_info[3] / 1048576,

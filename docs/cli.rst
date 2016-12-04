@@ -11,6 +11,7 @@ available in your system path.
 	usage: dottorrent_cli [-h] [--tracker TRACKER] [--web_seed WEB_SEED]
 	                      [--piece_size PIECE_SIZE] [--private]
 	                      [--comment COMMENT] [--date DATE] [--md5] [--verbose]
+	                      [--source SOURCE]
 	                      path output_path
 
 	Create a .torrent file
@@ -36,6 +37,7 @@ available in your system path.
 	                        timestamp/none/now (default: now)
 	  --md5                 Add per-file MD5 hashes
 	  --verbose, -v         verbose mode
+	  --source SOURCE
 
 	dottorrent/1.5.3 (https://github.com/kz26/dottorrent)
 
