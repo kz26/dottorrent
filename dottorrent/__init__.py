@@ -51,7 +51,7 @@ class Torrent(object):
 
     def __init__(self, path, trackers=None, web_seeds=None,
                  piece_size=None, private=False, creation_date=None,
-                 comment=None, created_by=None, include_md5=False):
+                 comment=None, created_by=None, include_md5=False, source=None):
         """
         :param path: path to a file or directory from which to create the torrent
         :param trackers: list/iterable of tracker URLs
@@ -64,6 +64,7 @@ class Torrent(object):
         :param created_by: name/version of the program used to create the .torrent.
             If None, defaults to the value of ``DEFAULT_CREATOR``.
         :param include_md5: If True, also computes and stores MD5 hashes for each file.
+        :param source: An optional source string for the torrent.
         """
 
         self.path = os.path.normpath(path)
@@ -75,6 +76,7 @@ class Torrent(object):
         self.comment = comment
         self.created_by = created_by
         self.include_md5 = include_md5
+        self.source = source
 
     @property
     def trackers(self):
@@ -276,6 +278,8 @@ class Torrent(object):
         data['info']['pieces'] = bytes(self._pieces)
         data['info']['piece length'] = self.piece_size
         data['info']['private'] = int(self.private)
+        if self.source:
+            data['info']['source'] = self.source.encode()
 
         self._data = data
         return True
