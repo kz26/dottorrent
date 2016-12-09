@@ -6,6 +6,7 @@ Changelog
 * Add support for source strings (-s)
 * Exclude hidden dotfiles from being added
 * Exclude hidden files on Windows (requires Python 3.5+)
+* Refactor - CLI tool is now simply `dottorrent`
 
 1.5.3
 -----

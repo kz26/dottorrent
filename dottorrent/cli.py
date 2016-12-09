@@ -32,7 +32,7 @@ from tqdm import tqdm
 import dottorrent
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(description='Create a .torrent file',
                                      epilog=dottorrent.DEFAULT_CREATOR)
     parser.add_argument('--tracker', '-t', action='append', dest='trackers',
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--private', '-p', action='store_true', help='set private flag')
     parser.add_argument(
-        '--source', help='source string (useful for private trackers')
+        '--source', help='source string (useful for private trackers)')
     parser.add_argument('--comment', '-c',
                         help='string for the torrent comment field')
     parser.add_argument('--date', '-d', default='now',
@@ -131,3 +131,7 @@ if __name__ == '__main__':
         t.save(f)
     print("Info hash: " + t.info_hash)
     print("Torrent file saved to {}".format(save_fn))
+
+
+if __name__ == '__main__':
+    main()
