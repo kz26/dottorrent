@@ -43,6 +43,20 @@ MIN_PIECE_SIZE = 2 ** 14
 MAX_PIECE_SIZE = 2 ** 22
 
 
+if sys.version_info >= (3, 5) and os.name == 'nt':
+    import stat
+
+    def is_hidden_file(path):
+        fn = path.split(os.sep)[-1]
+        return fn.startswith('.') or \
+            bool(os.stat(path).st_file_attributes &
+                 stat.FILE_ATTRIBUTE_HIDDEN)
+else:
+    def is_hidden_file(path):
+        fn = path.split(os.sep)[-1]
+        return fn.startswith('.')
+
+
 def print_err(v):
     print(v, file=sys.stderr)
 
@@ -50,8 +64,9 @@ def print_err(v):
 class Torrent(object):
 
     def __init__(self, path, trackers=None, web_seeds=None,
-                 piece_size=None, private=False, creation_date=None,
-                 comment=None, created_by=None, include_md5=False, source=None):
+                 piece_size=None, private=False, source=None,
+                 creation_date=None, comment=None, created_by=None,
+                 include_md5=False):
         """
         :param path: path to a file or directory from which to create the torrent
         :param trackers: list/iterable of tracker URLs
@@ -59,12 +74,12 @@ class Torrent(object):
         :param piece_size: Piece size in bytes. Must be >= 16 KB and a power of 2.
             If None, ``get_info()`` will be used to automatically select a piece size.
         :param private: The private flag. If True, DHT/PEX will be disabled.
+        :param source: An optional source string for the torrent.
         :param creation_date: An optional datetime object representing the torrent creation date.
         :param comment: An optional comment string for the torrent.
         :param created_by: name/version of the program used to create the .torrent.
             If None, defaults to the value of ``DEFAULT_CREATOR``.
         :param include_md5: If True, also computes and stores MD5 hashes for each file.
-        :param source: An optional source string for the torrent.
         """
 
         self.path = os.path.normpath(path)
@@ -72,11 +87,11 @@ class Torrent(object):
         self.web_seeds = web_seeds
         self.piece_size = piece_size
         self.private = private
+        self.source = source
         self.creation_date = creation_date
         self.comment = comment
         self.created_by = created_by
         self.include_md5 = include_md5
-        self.source = source
 
     @property
     def trackers(self):
@@ -150,7 +165,7 @@ class Torrent(object):
                 for fn in x[2]:
                     fpath = os.path.normpath(os.path.join(x[0], fn))
                     fsize = os.path.getsize(fpath)
-                    if fsize:
+                    if fsize and not is_hidden_file(fpath):
                         total_size += fsize
                         total_files += 1
         else:
@@ -188,7 +203,7 @@ class Torrent(object):
                 for fn in x[2]:
                     fpath = os.path.normpath(os.path.join(x[0], fn))
                     fsize = os.path.getsize(fpath)
-                    if fsize:
+                    if fsize and not is_hidden_file(fpath):
                         files.append((fpath, fsize, {}))
         else:
             raise exceptions.InvalidInputException

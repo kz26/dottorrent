@@ -46,8 +46,10 @@ if __name__ == '__main__':
         '--piece_size', '-s', type=int, help='piece size in bytes')
     parser.add_argument(
         '--private', '-p', action='store_true', help='set private flag')
+    parser.add_argument(
+        '--source', help='source string (useful for private trackers')
     parser.add_argument('--comment', '-c',
-                        help='free-text string for the torrent comment field')
+                        help='string for the torrent comment field')
     parser.add_argument('--date', '-d', default='now',
                         help='Torrent creation date. \
                         Valid values: unix timestamp/none/now (default: now)')
@@ -61,8 +63,6 @@ if __name__ == '__main__':
         'output_path', help='Output path for created .torrent file. \
         If a directory is provided, the filename will be automatically \
         generated based on the input.')
-    parser.add_argument(
-        '--source', help='Set source string')
     args = parser.parse_args()
 
     if args.date:

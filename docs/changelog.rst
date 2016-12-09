@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.6.0
+-----
+* Add support for source strings (-s)
+* Exclude hidden dotfiles from being added
+* Exclude hidden files on Windows (requires Python 3.5+)
+
 1.5.3
 -----
 * Use relative paths instead of absolute paths for directory mode path generation
