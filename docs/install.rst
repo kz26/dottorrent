@@ -4,7 +4,7 @@ Installation
 Requirements
 ------------
 
-* Python 3.3+
+* Python 3.3+ (Python 3.5+ recommended)
 * See ``requirements.txt`` for additional dependencies.
 
 Stable releases are available on PyPI and can be installed using ``pip``.
