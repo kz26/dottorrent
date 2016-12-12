@@ -3,7 +3,7 @@ Changelog
 
 1.6.0
 -----
-* Add support for source strings (-s)
+* Add support for source strings (--source option)
 * Exclude hidden dotfiles from being added
 * Exclude hidden files on Windows (requires Python 3.5+)
 * Refactor - CLI tool is now simply `dottorrent`
