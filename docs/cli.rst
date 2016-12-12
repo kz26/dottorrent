@@ -41,6 +41,8 @@ available in your system path.
 	dottorrent/1.6.0 (https://github.com/kz26/dottorrent)
 
 
+When creating a torrent, all dotfiles (filenames beginning with a '.') are excluded. On Windows systems running Python 3.5+, all hidden files are excluded as well.
+
 To add multiple trackers and/or web seeds, repeat the ``-t`` and ``-w`` as many times as necessary,
 e.g. ``-t tracker1 -t tracker2``.
 
