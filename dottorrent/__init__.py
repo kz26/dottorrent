@@ -25,6 +25,7 @@ from base64 import b32encode
 from collections import OrderedDict
 from datetime import datetime
 from hashlib import sha1, md5
+import fnmatch
 import math
 import os
 import sys
@@ -66,7 +67,7 @@ class Torrent(object):
     def __init__(self, path, trackers=None, web_seeds=None,
                  piece_size=None, private=False, source=None,
                  creation_date=None, comment=None, created_by=None,
-                 include_md5=False):
+                 include_md5=False, exclude=None):
         """
         :param path: path to a file or directory from which to create the torrent
         :param trackers: list/iterable of tracker URLs
@@ -75,6 +76,7 @@ class Torrent(object):
             If None, ``get_info()`` will be used to automatically select a piece size.
         :param private: The private flag. If True, DHT/PEX will be disabled.
         :param source: An optional source string for the torrent.
+        :param exclude: A list of file extensions that should be excluded from the torrent.
         :param creation_date: An optional datetime object representing the torrent creation date.
         :param comment: An optional comment string for the torrent.
         :param created_by: name/version of the program used to create the .torrent.
@@ -88,6 +90,7 @@ class Torrent(object):
         self.piece_size = piece_size
         self.private = private
         self.source = source
+        self.exclude = exclude
         self.creation_date = creation_date
         self.comment = comment
         self.created_by = created_by
@@ -163,6 +166,8 @@ class Torrent(object):
             total_files = 0
             for x in os.walk(self.path):
                 for fn in x[2]:
+                    if any(fnmatch.fnmatch(fn, ext) for ext in self.exclude):
+                        continue
                     fpath = os.path.normpath(os.path.join(x[0], fn))
                     fsize = os.path.getsize(fpath)
                     if fsize and not is_hidden_file(fpath):
@@ -201,6 +206,8 @@ class Torrent(object):
         elif os.path.exists(self.path):
             for x in os.walk(self.path):
                 for fn in x[2]:
+                    if any(fnmatch.fnmatch(fn, ext) for ext in self.exclude):
+                        continue
                     fpath = os.path.normpath(os.path.join(x[0], fn))
                     fsize = os.path.getsize(fpath)
                     if fsize and not is_hidden_file(fpath):

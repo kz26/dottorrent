@@ -48,6 +48,10 @@ def main():
         '--private', '-p', action='store_true', help='set private flag')
     parser.add_argument(
         '--source', help='source string (useful for private trackers)')
+    parser.add_argument(
+        '--exclude', help='file patterns that should be excluded (can be '
+        'specified multiple times)', action='append', dest='exclude',
+        metavar='RE', default=[])
     parser.add_argument('--comment', '-c',
                         help='string for the torrent comment field')
     parser.add_argument('--date', '-d', default='now',
@@ -83,7 +87,8 @@ def main():
                            comment=args.comment,
                            creation_date=creation_date,
                            include_md5=args.md5,
-                           source=args.source
+                           source=args.source,
+                           exclude=args.exclude,
                            )
     t_info = t.get_info()
     print("Files: {}".format(t_info[1]))
@@ -102,6 +107,8 @@ def main():
         print("Creation date: {}".format(creation_date))
     if args.source:
         print("Source: " + t.source)
+    if args.exclude:
+        print("Excluded: {}".format(",".join(t.exclude)))
 
     pbar = tqdm(
         total=t_info[2] * t_info[3] / 1048576,
