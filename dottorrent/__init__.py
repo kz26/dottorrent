@@ -90,7 +90,7 @@ class Torrent(object):
         self.piece_size = piece_size
         self.private = private
         self.source = source
-        self.exclude = exclude
+        self.exclude = [] if exclude is None else exclude
         self.creation_date = creation_date
         self.comment = comment
         self.created_by = created_by
