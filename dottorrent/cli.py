@@ -49,14 +49,14 @@ def main():
     parser.add_argument(
         '--source', help='source string (useful for private trackers)')
     parser.add_argument(
-        '--exclude', help='file patterns that should be excluded (can be '
-        'specified multiple times)', action='append', dest='exclude',
+        '--exclude', '-x', help='filename patterns that should be excluded '
+        '(can be specified multiple times)', action='append', dest='exclude',
         metavar='RE', default=[])
     parser.add_argument('--comment', '-c',
                         help='string for the torrent comment field')
     parser.add_argument('--date', '-d', default='now',
-                        help='Torrent creation date. \
-                        Valid values: unix timestamp/none/now (default: now)')
+                        help='Torrent creation date. '
+                        'Valid values: unix timestamp/none/now (default: now)')
     parser.add_argument(
         '--md5', action='store_true', help='Add per-file MD5 hashes')
     parser.add_argument(
@@ -64,9 +64,9 @@ def main():
     parser.add_argument(
         'path', help='path to file/directory to create torrent from')
     parser.add_argument(
-        'output_path', help='Output path for created .torrent file. \
-        If a directory is provided, the filename will be automatically \
-        generated based on the input.')
+        'output_path', help='Output path for created .torrent file. '
+        'If a directory is provided, the filename will be automatically'
+        'generated based on the input.')
     args = parser.parse_args()
 
     if args.date:
@@ -108,7 +108,7 @@ def main():
     if args.source:
         print("Source: " + t.source)
     if args.exclude:
-        print("Excluded: {}".format(",".join(t.exclude)))
+        print("Excluded: {}".format(', '.join(t.exclude)))
 
     pbar = tqdm(
         total=t_info[2] * t_info[3] / 1048576,

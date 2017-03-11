@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.7.0
+-----
+* Implement filename pattern exclusion from PR #7 (--exclude, -x)
+
 1.6.0
 -----
 * Add support for source strings (--source option)

@@ -20,6 +20,7 @@ Features
 * Source string support
 * Info hash generation for created torrents
 * User-definable comment field, creation date, creator, etc.
+* Filename pattern exclusion
 * Per-file MD5 hash inclusion
 
 

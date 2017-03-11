@@ -76,7 +76,7 @@ class Torrent(object):
             If None, ``get_info()`` will be used to automatically select a piece size.
         :param private: The private flag. If True, DHT/PEX will be disabled.
         :param source: An optional source string for the torrent.
-        :param exclude: A list of file extensions that should be excluded from the torrent.
+        :param exclude: A list of filename patterns that should be excluded from the torrent.
         :param creation_date: An optional datetime object representing the torrent creation date.
         :param comment: An optional comment string for the torrent.
         :param created_by: name/version of the program used to create the .torrent.
