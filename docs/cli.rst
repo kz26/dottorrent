@@ -11,7 +11,7 @@ available in your system path.
 	usage: dottorrent [-h] [--tracker TRACKER] [--web_seed WEB_SEED]
                   [--piece_size PIECE_SIZE] [--private] [--source SOURCE]
                   [--comment COMMENT] [--date DATE] [--md5] [--verbose]
-                  path output_path
+                  [--exclude RE] path output_path
 
 	Create a .torrent file
 
@@ -25,6 +25,9 @@ available in your system path.
 	  -h, --help            show this help message and exit
 	  --tracker TRACKER, -t TRACKER
 	                        tracker URL (can be specified multiple times)
+      --exclude RE
+                            file pattern that should be excluded from the
+                            torrent (can be specified multiple times)
 	  --web_seed WEB_SEED, -w WEB_SEED
 	                        web seed URL (can be specified multiple times)
 	  --piece_size PIECE_SIZE, -s PIECE_SIZE
@@ -43,6 +46,6 @@ available in your system path.
 
 When creating a torrent, all dotfiles (filenames beginning with a '.') are excluded. On Windows systems running Python 3.5+, all hidden files are excluded as well.
 
-To add multiple trackers and/or web seeds, repeat the ``-t`` and ``-w`` as many times as necessary,
-e.g. ``-t tracker1 -t tracker2``.
+To add multiple trackers, web seeds and/or exclusion patterns, repeat the ``-t``, ``-w`` or ``--exclude`` as many times as necessary,
+e.g. ``-t tracker1 -t tracker2`` or ``--exclude "*.jpg" --exclude "*.png"``.
 
