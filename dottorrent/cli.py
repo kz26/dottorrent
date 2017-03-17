@@ -26,7 +26,7 @@ import argparse
 import os.path
 from datetime import datetime
 
-from humanfriendly import format_size
+from humanfriendly import format_size, parse_size
 from tqdm import tqdm
 
 import dottorrent
@@ -43,14 +43,16 @@ def main():
         metavar='WEB_SEED',
         help='web seed URL (can be specified multiple times)')
     parser.add_argument(
-        '--piece_size', '-s', type=int, help='piece size in bytes')
+        '--piece_size', '-s', help='piece size, e.g. 16KB, 1M. '
+        'Leave unspecified for automatic piece size')
     parser.add_argument(
-        '--private', '-p', action='store_true', help='set private flag')
+        '--private', '-p', action='store_true', help='set private flag '
+        '(useful for private trackers)')
     parser.add_argument(
         '--source', help='source string (useful for private trackers)')
     parser.add_argument(
         '--exclude', '-x', help='filename patterns that should be excluded '
-        '(can be specified multiple times)', action='append', dest='exclude',
+        '(can be specified multiple times)', action='append',
         metavar='RE', default=[])
     parser.add_argument('--comment', '-c',
                         help='string for the torrent comment field')
@@ -65,9 +67,15 @@ def main():
         'path', help='path to file/directory to create torrent from')
     parser.add_argument(
         'output_path', help='Output path for created .torrent file. '
-        'If a directory is provided, the filename will be automatically'
+        'If a directory is provided, the filename will be automatically '
         'generated based on the input.')
     args = parser.parse_args()
+
+    if args.piece_size:
+        if args.piece_size.isdigit():
+            piece_size = int(args.piece_size)
+        else:
+            piece_size = parse_size(args.piece_size, binary=True)
 
     if args.date:
         if args.date.isdigit():
@@ -82,7 +90,7 @@ def main():
     t = dottorrent.Torrent(args.path,
                            trackers=args.trackers,
                            web_seeds=args.web_seeds,
-                           piece_size=args.piece_size,
+                           piece_size=piece_size,
                            private=args.private,
                            comment=args.comment,
                            creation_date=creation_date,

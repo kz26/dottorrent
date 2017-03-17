@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.8.0
+-----
+* Human-friendly piece size specification in CLI
+* Minor string formatting improvements
+
 1.7.0
 -----
 * Implement filename pattern exclusion from PR #7 (--exclude, -x)
