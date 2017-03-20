@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.9.1
+-----
+* Fix unreferenced piece size error in CLI
+
 1.9.0
 -----
 * Increase MAX_PIECE_SIZE to 64 MiB

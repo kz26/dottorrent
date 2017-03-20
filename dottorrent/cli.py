@@ -76,6 +76,8 @@ def main():
             piece_size = int(args.piece_size)
         else:
             piece_size = parse_size(args.piece_size, binary=True)
+    else:
+        piece_size = None
 
     if args.date:
         if args.date.isdigit():
