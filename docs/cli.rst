@@ -42,7 +42,7 @@ available in your system path.
 	--md5                 Add per-file MD5 hashes
 	--verbose, -v         verbose mode
 
-	dottorrent/1.8.0 (https://github.com/kz26/dottorrent)
+	dottorrent/1.9.0 (https://github.com/kz26/dottorrent)
 
 
 When creating a torrent, all dotfiles (filenames beginning with a '.') are excluded. On Windows systems running Python 3.5+, all hidden files are excluded as well.

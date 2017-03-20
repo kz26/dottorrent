@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.9.0
+-----
+* Increase MAX_PIECE_SIZE to 64 MiB
+* Minor docstring improvements
+
 1.8.0
 -----
 * Human-friendly piece size specification in CLI

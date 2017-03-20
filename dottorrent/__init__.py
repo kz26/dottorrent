@@ -41,7 +41,7 @@ DEFAULT_CREATOR = "dottorrent/{} (https://github.com/kz26/dottorrent)".format(
 
 
 MIN_PIECE_SIZE = 2 ** 14
-MAX_PIECE_SIZE = 2 ** 22
+MAX_PIECE_SIZE = 2 ** 26
 
 
 if sys.version_info >= (3, 5) and os.name == 'nt':
@@ -139,22 +139,24 @@ class Torrent(object):
             if value > 0 and (value & (value-1) == 0):
                 if value < MIN_PIECE_SIZE:
                     raise exceptions.InvalidPieceSizeException(
-                        "Piece size should be at least 16 KB")
+                        "Piece size should be at least 16 KiB")
                 if value > MAX_PIECE_SIZE:
-                    print_err("Warning: piece size is greater than 4 MB")
+                    print_err("Warning: piece size is greater than 64 MiB")
                 self._piece_size = value
             else:
                 raise exceptions.InvalidPieceSizeException(
-                    "Piece size must be a power of 2")
+                    "Piece size must be a power of 2 bytes")
         else:
             self._piece_size = None
 
     def get_info(self):
         """
         Scans the input path and automatically determines the optimal
-        piece size (up to 4 MB), along with other basic info such
-        as the total size and the total number of files. If ``piece_size``
-        has already been set, the custom value will be used instead.
+        piece size based on ~1500 pieces (up to MAX_PIECE_SIZE) along
+        with other basic info, including total size (in bytes), the
+        total number of files, piece size (in bytes), and resulting
+        number of pieces. If ``piece_size`` has already been set, the
+        custom value will be used instead.
 
         :return: ``(total_size, total_files, piece_size, num_pieces)``
         """
