@@ -267,10 +267,10 @@ class Torrent(object):
 
         # Create the torrent data structure
         data = OrderedDict()
-        if len(self.trackers) == 1:
+        if len(self.trackers) > 0:
             data['announce'] = self.trackers[0].encode()
-        elif len(self.trackers) > 1:
-            data['announce-list'] = [[x.encode()] for x in self.trackers]
+            if len(self.trackers) > 1:
+                data['announce-list'] = [[x.encode()] for x in self.trackers]
         if self.comment:
             data['comment'] = self.comment.encode()
         if self.created_by:

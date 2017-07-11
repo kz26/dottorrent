@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.9.2
+-----
+* Always set announce key, even for multi-tracker torrents (https://github.com/kz26/dottorrent-gui/issues/15)
+
 1.9.1
 -----
 * Fix unreferenced piece size error in CLI
