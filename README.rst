@@ -24,6 +24,11 @@ Stable releases are available on PyPI and can be installed using ``pip``.
 To install from the latest development sources, clone the git repo and run
 ``pip install .``
 
+GUI
+---
+
+Looking for a GUI? Check out `dottorrent-gui <https://github.com/kz26/dottorrent-gui>`_.
+
 License
 -------
 
