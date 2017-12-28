@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.10.0
+------
+* Expose torrent data dictionary as a public property
+* Refactor dottorrent CLI into its own package
+
 1.9.2
 -----
 * Always set announce key, even for multi-tracker torrents (https://github.com/kz26/dottorrent-gui/issues/15)
