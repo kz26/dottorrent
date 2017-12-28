@@ -25,9 +25,10 @@ To install from the latest development sources, clone the git repo and run
 ``pip install .``
 
 CLI and GUI
----
+-----------
 
-Looking for a command-line interface? Check out `dottorrent-gui <https://github.com/kz26/dottorrent-cli>`_.    
+Looking for a command-line interface? Check out `dottorrent-gui <https://github.com/kz26/dottorrent-cli>`_.
+
 Looking for a GUI? Check out `dottorrent-gui <https://github.com/kz26/dottorrent-gui>`_.
 
 License
