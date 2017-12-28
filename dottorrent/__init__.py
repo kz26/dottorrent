@@ -96,6 +96,8 @@ class Torrent(object):
         self.created_by = created_by
         self.include_md5 = include_md5
 
+        self._data = None
+
     @property
     def trackers(self):
         return self._trackers
@@ -307,6 +309,19 @@ class Torrent(object):
 
         self._data = data
         return True
+
+    @property
+    def data(self):
+        """
+        Returns the data dictionary for the torrent.
+
+        .. note:: ``generate()`` must be called first.
+        """
+    
+        if self._data:
+            return self._data
+        else:
+            raise exceptions.TorrentNotGeneratedException
 
     @property
     def info_hash_base32(self):
