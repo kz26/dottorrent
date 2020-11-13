@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.10.1
+------
+* Bump bencoder.pyx dependency to v2.0.0
+
 1.10.0
 ------
 * Expose torrent data dictionary as a public property
