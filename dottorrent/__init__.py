@@ -170,9 +170,10 @@ class Torrent(object):
             total_files = 0
             for x in os.walk(self.path):
                 for fn in x[2]:
-                    if any(fnmatch.fnmatch(fn, ext) for ext in self.exclude):
-                        continue
                     fpath = os.path.normpath(os.path.join(x[0], fn))
+                    rel_path = os.path.relpath(fpath, self.path)
+                    if any(fnmatch.fnmatch(rel_path, ext) for ext in self.exclude):
+                        continue
                     fsize = os.path.getsize(fpath)
                     if fsize and not is_hidden_file(fpath):
                         total_size += fsize
@@ -210,9 +211,10 @@ class Torrent(object):
         elif os.path.exists(self.path):
             for x in os.walk(self.path):
                 for fn in x[2]:
-                    if any(fnmatch.fnmatch(fn, ext) for ext in self.exclude):
-                        continue
                     fpath = os.path.normpath(os.path.join(x[0], fn))
+                    rel_path = os.path.relpath(fpath, self.path)
+                    if any(fnmatch.fnmatch(rel_path, ext) for ext in self.exclude):
+                        continue
                     fsize = os.path.getsize(fpath)
                     if fsize and not is_hidden_file(fpath):
                         files.append((fpath, fsize, {}))
