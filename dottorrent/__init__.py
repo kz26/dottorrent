@@ -65,7 +65,7 @@ def print_err(v):
 class Torrent(object):
 
     def __init__(self, path, trackers=None, web_seeds=None,
-                 piece_size=None, private=False, source=None,
+                 piece_size=None, private=False, source=None, xseed=False,
                  creation_date=None, comment=None, created_by=None,
                  include_md5=False, exclude=None):
         """
@@ -76,6 +76,7 @@ class Torrent(object):
             If None, ``get_info()`` will be used to automatically select a piece size.
         :param private: The private flag. If True, DHT/PEX will be disabled.
         :param source: An optional source string for the torrent.
+        :param xseed: Randomize the info hash to help with cross-seeding. If True, this adds an entropy field to the info section of the metainfo and sets it to a random integer.
         :param exclude: A list of filename patterns that should be excluded from the torrent.
         :param creation_date: An optional datetime object representing the torrent creation date.
         :param comment: An optional comment string for the torrent.
@@ -90,6 +91,7 @@ class Torrent(object):
         self.piece_size = piece_size
         self.private = private
         self.source = source
+        self.xseed = xseed
         self.exclude = [] if exclude is None else exclude
         self.creation_date = creation_date
         self.comment = comment
@@ -308,6 +310,9 @@ class Torrent(object):
         data['info']['private'] = int(self.private)
         if self.source:
             data['info']['source'] = self.source.encode()
+        if self.xseed:
+            import random
+            data['info']['entropy'] = random.randint(int(-2e9), int(2e9))
 
         self._data = data
         return True
